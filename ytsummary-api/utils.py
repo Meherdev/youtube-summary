@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from db import SessionLocal
 from passlib.context import CryptContext
 from models import SummaryUsage
+from fastapi import HTTPException
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -28,7 +29,11 @@ def download_audio(url: str, output_dir="downloads") -> str:
         "-o", f"{output_dir}/%(id)s.%(ext)s",
         url
     ]
-    subprocess.run(command, check=True)
+    try:
+        subprocess.run(command, check=True)
+    except subprocess.CalledProcessError as e:
+        print("yt-dlp failed:", e.stderr)
+        raise HTTPException(status_code=500, detail="Failed to download video. Server error.")
     for file in os.listdir(output_dir):
         if file.endswith(".mp3"):
             return os.path.join(output_dir, file)
