@@ -67,7 +67,7 @@ def register(username: EmailStr, password: str, response: Response, db: Session 
         value=token,
         httponly=True,
         secure=True,  # only works over HTTPS in production
-        samesite="lax",
+        samesite="None",
         max_age=60 * 60  # 1 hour
     )
 
@@ -89,7 +89,7 @@ def login(response: Response, form_data: OAuth2PasswordRequestForm = Depends(), 
         value=token,
         httponly=True,
         secure=True,
-        samesite="lax",
+        samesite="None",
         max_age=60 * 60
     )
 
