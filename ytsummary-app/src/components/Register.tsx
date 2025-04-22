@@ -1,8 +1,8 @@
 import { useState } from "react";
-import axios from "axios";
 import CircleLoader from "./CircleLoader";
 import useAuth from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import api from "../Api";
 
 const RegisterForm = () => {
   const [username, setUsername] = useState("");
@@ -17,7 +17,7 @@ const RegisterForm = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post("/register", null, {
+      const res = await api.post("/register", null, {
         params: { username, password },
       });
       setUserName(res.data.username);
