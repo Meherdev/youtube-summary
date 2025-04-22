@@ -1,22 +1,41 @@
-import { useState } from 'react';
-import UrlInput from './components/UrlInput';
-import ResultCard from './components/ResultCard';
-import Loader from './components/Loader';
-import { SummaryResponse } from './types/summary';
-import LanguageNotice from './components/LanguageNotice';
+import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
+import AuthForm from "./pages/Auth";
+import { AuthProvider } from "./context/authContext";
+import useAuth from "./hooks/useAuth";
+import Summary from "./pages/summary";
+import { JSX } from "react";
+
+const PublicRoute = ({ children }: { children: JSX.Element }) => {
+  const { isLoggedIn } = useAuth();
+  return isLoggedIn ? <Navigate to="/summary" replace /> : children;
+};
+
+const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
+  const { isLoggedIn } = useAuth();
+  return isLoggedIn ? children : <Navigate to="/" replace />;
+};
 
 function App() {
-  const [result, setResult] = useState<SummaryResponse | null>(null);
-  const [loading, setLoading] = useState(false);
-
   return (
-    <main className="min-h-screen flex flex-col items-center px-4 py-10">
-      <h1 className="text-3xl font-semibold mb-4 text-center">🎬 YouTube Video Summarizer</h1>
-      <UrlInput onResult={setResult} onLoading={setLoading} />
-      <LanguageNotice />  {/* 👈 Place it here */}
-      {loading && <Loader />}
-      <ResultCard result={result} />
-    </main>
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={
+            <PublicRoute>
+              <AuthForm />
+            </PublicRoute>
+            } />
+          <Route
+            path="/summary"
+            element={
+              <ProtectedRoute>
+                <Summary />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }
 
