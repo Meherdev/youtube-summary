@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import axios from 'axios';
 import { getOrCreateDeviceId } from '../utils';
+import api from '../Api';
 
 interface Props {
   onResult: (data: any) => void;
@@ -17,7 +17,7 @@ export default function UrlInput({ onResult, onLoading }: Props) {
     onLoading(true);
     try {
       const deviceId = getOrCreateDeviceId();
-      const res = await axios.post('/summarize', new URLSearchParams({ youtube_url: url, device_id: deviceId }));
+      const res = await api.post('/summarize', new URLSearchParams({ youtube_url: url, device_id: deviceId }));
       onResult(res.data);
       setErrorMsg("");
     } catch (err: any) {

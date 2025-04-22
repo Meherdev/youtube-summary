@@ -1,6 +1,5 @@
-// src/context/AuthContext.tsx
-import axios from "axios";
 import { createContext, useState, ReactNode, useEffect } from "react";
+import api from "../Api";
 
 type AuthContextType = {
   logout: () => void; 
@@ -18,7 +17,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 
   useEffect(() => {
-    axios
+    api
       .get("/me")
       .then((res) => {
         setUsernameState(res.data.username);
@@ -35,7 +34,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = () => {
-    axios.post("/logout").finally(() => {
+    api.post("/logout").finally(() => {
       setUsernameState(null);
       setIsLoggedIn(false);
     });

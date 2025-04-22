@@ -1,8 +1,8 @@
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import CircleLoader from "./CircleLoader";
+import api from "../Api";
 
 const LoginForm = () => {
   const {setUserName, setIsLoggedIn } = useAuth();
@@ -20,7 +20,7 @@ const LoginForm = () => {
       form.append("username", username);
       form.append("password", password);
 
-      const res = await axios.post("/token", form, {
+      const res = await api.post("/token", form, {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
       });
 
