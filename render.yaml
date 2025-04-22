@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: ytsummary-api
+    env: python
+    plan: free
+    region: oregon
+    buildCommand: pip install -r ytsummary-api/requirements.txt
+    startCommand: gunicorn main:app -k uvicorn.workers.UvicornWorker --chdir ytsummary-api
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: JWT_SECRET_KEY
+        sync: false
+      - key: JWT_EXPIRATION
+        sync: false

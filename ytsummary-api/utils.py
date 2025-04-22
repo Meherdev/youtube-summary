@@ -3,10 +3,13 @@ import subprocess
 from openai import OpenAI
 from dotenv import load_dotenv
 import json
-from datetime import datetime, timezone
-from models import DeviceRequest
+from datetime import date
 from sqlalchemy.orm import Session
 from db import SessionLocal
+from passlib.context import CryptContext
+from models import SummaryUsage
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 load_dotenv()
 
@@ -59,19 +62,6 @@ def summarize_text(text: str) -> str:
     )
     return response.choices[0].message.content.strip()
 
-def is_device_allowed(db: Session, device_id: str) -> bool:
-    today = datetime.now(timezone.utc).date()
-    start_of_day = datetime.combine(today, datetime.min.time())
-    end_of_day = datetime.combine(today, datetime.max.time())
-
-    count = db.query(DeviceRequest).filter(
-        DeviceRequest.device_id == device_id,
-        DeviceRequest.created_at >= start_of_day,
-        DeviceRequest.created_at <= end_of_day
-    ).count()
-
-    return count < 8
-
 def get_db():
     db = SessionLocal()
     try:
@@ -79,3 +69,43 @@ def get_db():
     finally:
         db.close()
 
+def hash_password(password: str):
+    return pwd_context.hash(password)
+
+def verify_password(plain: str, hashed: str):
+    return pwd_context.verify(plain, hashed)
+
+def check_and_increment_summary_usage(user_id: int, db: Session, daily_limit: int = 5):
+    today = date.today()
+    usage = db.query(SummaryUsage).filter_by(user_id=user_id, date=today).first()
+
+    if usage and usage.count >= daily_limit:
+        return False  # Limit exceeded
+
+    if usage:
+        usage.count += 1
+    else:
+        usage = SummaryUsage(user_id=user_id, date=today, count=1)
+        db.add(usage)
+
+    db.commit()
+    return True
+
+def check_summary_limit(user_id: int, db: Session, daily_limit: int = 5) -> bool:
+    today = date.today()
+    usage = db.query(SummaryUsage).filter_by(user_id=user_id, date=today).first()
+    if usage and usage.count >= daily_limit:
+        return False
+    return True
+
+def increment_summary_count(user_id: int, db: Session):
+    today = date.today()
+    usage = db.query(SummaryUsage).filter_by(user_id=user_id, date=today).first()
+    
+    if usage:
+        usage.count += 1
+    else:
+        usage = SummaryUsage(user_id=user_id, date=today, count=1)
+        db.add(usage)
+    
+    db.commit()
