@@ -4,7 +4,7 @@ services:
     env: python
     plan: free
     region: oregon
-    buildCommand: pip install -r ytsummary-api/requirements.txt
+    buildCommand: ./ytsummary-api/build.sh
     startCommand: gunicorn main:app -k uvicorn.workers.UvicornWorker --chdir ytsummary-api
     envVars:
       - key: OPENAI_API_KEY
