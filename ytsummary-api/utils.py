@@ -9,6 +9,8 @@ from db import SessionLocal
 from passlib.context import CryptContext
 from models import SummaryUsage
 from fastapi import HTTPException
+import shutil
+
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -19,11 +21,19 @@ client = OpenAI(
 )
 
 def download_audio(url: str, output_dir="downloads") -> str:
+    source_cookie_path = "/etc/secrets/cookies.txt"
+    temp_cookie_path = f"/tmp/cookies.txt"
+        # ✅ Copy cookies.txt to a writable location
+    if os.path.exists(source_cookie_path):
+        shutil.copy(source_cookie_path, temp_cookie_path)
+        print("✅ cookies.txt copied to /tmp")
+    else:
+        print("⚠️ cookies.txt not found at expected path.")
+        raise Exception("Authentication cookies missing.")
     os.makedirs(output_dir, exist_ok=True)
     command = [
         "yt-dlp",
-        "--cookies", "/etc/secrets/cookies.txt", 
-        "--no-write-cookies",
+        "--cookies", temp_cookie_path, 
         "-f", "bestaudio[abr<=64]",
         "--extract-audio",
         "--audio-format", "mp3",
