@@ -22,7 +22,7 @@ def download_audio(url: str, output_dir="downloads") -> str:
     os.makedirs(output_dir, exist_ok=True)
     command = [
         "yt-dlp",
-        "--cookies", "/app/cookies.txt", 
+        "--cookies", "/etc/secrets/cookies.txt", 
         "-f", "bestaudio[abr<=64]",
         "--extract-audio",
         "--audio-format", "mp3",
