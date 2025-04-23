@@ -13,3 +13,13 @@ services:
         sync: false
       - key: JWT_EXPIRATION
         sync: false
+      - key: COOKIE_B64
+        sync: false
+
+
+if [ -n "$COOKIE_B64" ]; then
+  echo "$COOKIE_B64" | base64 -d > /app/cookies.txt
+  echo "✅ cookies.txt created from COOKIE_B64 env variable"
+else
+  echo "⚠️ COOKIE_B64 not set. YouTube downloads may fail."
+fi
