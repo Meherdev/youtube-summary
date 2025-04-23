@@ -59,6 +59,7 @@ ENV/
 env/
 env.bak/
 venv.bak/
+cookies.txt
 
 # === Node / React / Vite ===
 node_modules/
