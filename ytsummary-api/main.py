@@ -12,10 +12,33 @@ from utils import hash_password, verify_password
 from auth import create_access_token
 from jose import jwt, JWTError
 from pydantic import EmailStr, BaseModel
+from contextlib import asynccontextmanager
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    if os.getenv("ENV") == "production":
+        src = "/etc/secrets/cookies.txt"
+        dst = "/tmp/cookies.txt"
+
+        try:
+            if os.path.exists(src):
+                shutil.copy(src, dst)
+                print("✅ [PROD] cookies.txt copied from secrets to /tmp")
+            else:
+                print("❌ [PROD] cookies.txt not found in /etc/secrets")
+        except Exception as e:
+            print("❌ [PROD] Failed to copy cookies.txt:", str(e))
+    else:
+        print("🔧 [DEV] Skipping cookies.txt setup")
+
+    yield  # startup is done
+    # optional: add shutdown logic here if needed
+
+app = FastAPI(lifespan=lifespan)
 
 load_dotenv()
 
-app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,

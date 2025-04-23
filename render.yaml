@@ -15,3 +15,5 @@ services:
         sync: false
       - key: COOKIE_B64
         sync: false
+      - key: ENV
+        sync: false
