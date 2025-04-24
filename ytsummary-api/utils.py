@@ -20,21 +20,12 @@ client = OpenAI(
   api_key=os.getenv("OPENAI_API_KEY"),
 )
 
-def ensure_cookie_file():
-    cookie_b64 = os.getenv("COOKIE_B64")
-    if cookie_b64 and not os.path.exists("/tmp/cookies.txt"):
-        decoded = base64.b64decode(cookie_b64)
-        with open("/tmp/cookies.txt", "wb") as f:
-            f.write(decoded)
-        print("✅ cookies.txt written inside route")
-
 
 def download_audio(url: str, output_dir="downloads") -> str:
     os.makedirs(output_dir, exist_ok=True)
-    ensure_cookie_file()
     command = [
         "yt-dlp",
-        "--cookies", "/tmp/cookies.txt",
+        "--cookies", "cookies.txt",  # ✅ Use directly
         "-f", "bestaudio/best",
         "--extract-audio",
         "--audio-format", "mp3",

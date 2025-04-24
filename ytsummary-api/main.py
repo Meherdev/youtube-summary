@@ -12,30 +12,8 @@ from utils import hash_password, verify_password
 from auth import create_access_token
 from jose import jwt, JWTError
 from pydantic import EmailStr, BaseModel
-from contextlib import asynccontextmanager
-import base64
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    if os.getenv("ENV") == "production":
-        cookie_b64 = os.getenv("COOKIE_B64")
-        if cookie_b64:
-            try:
-                with open("/tmp/cookies.txt", "wb") as f:
-                    print(base64.b64decode(cookie_b64))
-                    f.write(base64.b64decode(cookie_b64))
-                print("✅ cookies.txt written to /tmp")
-            except Exception as e:
-                print("❌ Failed to decode cookies.txt:", str(e))
-        else:
-            print("⚠️ COOKIE_B64 not found in environment")
-    else:
-        print("🔧 [DEV] Skipping cookies.txt setup")
-    
-    yield
-
-
-app = FastAPI(lifespan=lifespan)
+app = FastAPI()
 
 load_dotenv()
 
