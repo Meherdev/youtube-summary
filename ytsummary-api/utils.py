@@ -21,22 +21,17 @@ client = OpenAI(
 )
 
 def download_audio(url: str, output_dir="downloads") -> str:
-    
+    os.makedirs(output_dir, exist_ok=True)
     command = [
         "yt-dlp",
-        "--cookies", "/tmp/cookies.txt", 
-        "-f", "bestaudio/best",
+        "-f", "bestaudio[abr<=64]",
         "--extract-audio",
         "--audio-format", "mp3",
         "--audio-quality", "9",
         "-o", f"{output_dir}/%(id)s.%(ext)s",
         url
     ]
-    try:
-        subprocess.run(command, check=True)
-    except subprocess.CalledProcessError as e:
-        print("yt-dlp failed:", e.stderr)
-        raise HTTPException(status_code=500, detail="Failed to download video. Server error.")
+    subprocess.run(command, check=True)
     for file in os.listdir(output_dir):
         if file.endswith(".mp3"):
             return os.path.join(output_dir, file)
