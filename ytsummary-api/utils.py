@@ -25,12 +25,12 @@ def download_audio(url: str, output_dir="downloads") -> str:
     os.makedirs(output_dir, exist_ok=True)
     command = [
         "yt-dlp",
-        "--cookies", "cookies.txt",  # ✅ Use directly
+        "--cookies", "cookies.txt",
         "-f", "bestaudio/best",
         "--extract-audio",
         "--audio-format", "mp3",
         "--audio-quality", "5",
-        "-o", f"/tmp/%(id)s.%(ext)s",
+        "-o", f"{output_dir}/%(id)s.%(ext)s",
         url
     ]
     subprocess.run(command, check=True)
@@ -51,6 +51,7 @@ def get_audio_duration(path):
     return float(output["format"]["duration"])
 
 def transcribe_audio(file_path):
+    print("transcribing audio ...", file_path)
     with open(file_path, "rb") as audio_file:
         translated = client.audio.translations.create(
             model="whisper-1",
@@ -59,6 +60,7 @@ def transcribe_audio(file_path):
     return translated.text
 
 def summarize_text(text: str) -> str:
+    print("summarising text ...")
     prompt = f"Summarize the following video transcript:\n\n{text[:4000]}"
     response = client.chat.completions.create(
         model="gpt-4o-mini",
