@@ -22,7 +22,7 @@ async def lifespan(app: FastAPI):
         if cookie_b64:
             try:
                 with open("/tmp/cookies.txt", "wb") as f:
-                    print(base64.decode(cookie_b64))
+                    print(base64.b64decode(cookie_b64))
                     f.write(base64.b64decode(cookie_b64))
                 print("✅ cookies.txt written to /tmp")
             except Exception as e:
