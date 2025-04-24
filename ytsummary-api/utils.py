@@ -24,11 +24,12 @@ def download_audio(url: str, output_dir="downloads") -> str:
     os.makedirs(output_dir, exist_ok=True)
     command = [
         "yt-dlp",
-        "-f", "bestaudio[abr<=64]",
+        "--cookies", "/tmp/cookies.txt",
+        "-f", "bestaudio/best",
         "--extract-audio",
         "--audio-format", "mp3",
-        "--audio-quality", "9",
-        "-o", f"{output_dir}/%(id)s.%(ext)s",
+        "--audio-quality", "5",
+        "-o", f"/tmp/%(id)s.%(ext)s",
         url
     ]
     subprocess.run(command, check=True)
