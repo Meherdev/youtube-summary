@@ -14,7 +14,7 @@ export default function ResultCard({ result }: Props) {
       animate={{ opacity: 1, y: 0 }}
       className="w-full max-w-3xl mx-auto mt-8 p-6 bg-gray-800 rounded-xl shadow-xl"
     >
-      <h2 className="text-xl font-bold mb-2">📄 Summary</h2>
+      <h2 className="text-xl font-bold mb-2 text-white">📄 Summary</h2>
       <p className="text-gray-200 mb-4">{result.summary}</p>
 
       <details className="mb-4">
