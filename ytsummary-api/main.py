@@ -17,12 +17,16 @@ app = FastAPI()
 
 load_dotenv()
 
+allowed_origins = [
+    # "http://localhost:5173",    # Local development frontend
+    "https://youtube-summary-nu.vercel.app",  # Production frontend
+]
+
+
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://youtube-summary-nu.vercel.app"],
-    # allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=allowed_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -104,11 +108,11 @@ def login(response: Response, form_data: OAuth2PasswordRequestForm = Depends(), 
 @app.post("/summarize")
 async def summarize_video(youtube_url: str = Form(...),
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
 ):
-    try:        
-        if not check_summary_limit(current_user.id, db):
-            raise HTTPException(status_code=429, detail="Daily summary limit exceeded (5 per day).")
+    try:
+        # disabled auth        
+        # if not check_summary_limit(current_user.id, db):
+        #     raise HTTPException(status_code=429, detail="Daily summary limit exceeded (5 per day).")
         audio_path = download_audio(youtube_url)
         size = get_file_size_mb(audio_path)
 
@@ -122,7 +126,6 @@ async def summarize_video(youtube_url: str = Form(...),
         summary = summarize_text(transcript)
 
         shutil.rmtree("downloads", ignore_errors=True)
-        increment_summary_count(current_user.id, db)
         return {
             "audio_size_mb": size,
             "duration_minutes": duration_minutes,
@@ -130,6 +133,7 @@ async def summarize_video(youtube_url: str = Form(...),
             "summary": summary
         }
     except Exception as e:
+        print("Error during summarization:", str(e))
         raise HTTPException(status_code=500, detail=str(e))
     
 
