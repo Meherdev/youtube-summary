@@ -109,7 +109,8 @@ def login(response: Response, form_data: OAuth2PasswordRequestForm = Depends(), 
 async def summarize_video(youtube_url: str = Form(...),
     db: Session = Depends(get_db),
 ):
-    try:        
+    try:
+        # disabled auth        
         # if not check_summary_limit(current_user.id, db):
         #     raise HTTPException(status_code=429, detail="Daily summary limit exceeded (5 per day).")
         audio_path = download_audio(youtube_url)
